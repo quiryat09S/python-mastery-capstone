@@ -1,57 +1,34 @@
 import json
-import re
 from pathlib import Path
-
-# Expresión regular para validar el código SKU (3 letras - 3 números)
-PATRON_SKU = r"^[A-Z]{3}-\d{3}$"
-
-
-class ErrorDatoInvalido(Exception):
-    """Excepción para errores en campos del JSON."""
-
-
-def procesar_registro(item: dict) -> dict:
-    """Aplica Pattern Matching y Expresiones Regulares para validar cada registro."""
-    match item:
-        case {
-            "sku": str(sku),
-            "nombre": str(nombre),
-            "precio": precio_raw,
-            "activo": True,
-        }:
-            if not re.match(PATRON_SKU, sku):
-                raise ErrorDatoInvalido(f"SKU '{sku}' no cumple el formato 'AAA-000'")
-
-            try:
-                precio = float(precio_raw)
-                if precio <= 0:
-                    raise ValueError("El precio debe ser positivo")
-            except (ValueError, TypeError) as e:
-                raise ErrorDatoInvalido(f"Precio inválido ({precio_raw}): {e}")
-
-            return {"sku": sku, "nombre": nombre, "precio": precio}
-
-        case {"activo": False}:
-            raise ErrorDatoInvalido("Registro inactivo")
-
-        case _:
-            raise ErrorDatoInvalido("Estructura de registro no compatible o incompleta")
 
 
 def cargar_y_procesar_datos(ruta_archivo: Path) -> list[dict]:
+    """Lee un archivo JSON, filtra elementos activos y calcula el precio total
+
+    manejando errores de formato de forma segura.
+    """
     if not ruta_archivo.exists():
         raise FileNotFoundError(f"El archivo {ruta_archivo} no existe.")
 
-    with open(ruta_archivo, "r", encoding="utf-8") as archivo:
-        datos = json.load(archivo)
+    try:
+        with open(ruta_archivo, "r", encoding="utf-8") as archivo:
+            datos = json.load(archivo)
+    except json.JSONDecodeError as err:
+        print(f"Error al parsear el archivo JSON: {err}")
+        return []
 
     productos_validos = []
     for item in datos:
         try:
-            valido = procesar_registro(item)
-            productos_validos.append(valido)
-        except ErrorDatoInvalido as err:
-            print(f"Registro omitido: {err}")
+            if not item.get("activo"):
+                continue
+
+            precio = float(item["precio"])
+            productos_validos.append(
+                {"id": item["id"], "nombre": item["nombre"], "precio": precio}
+            )
+        except (KeyError, ValueError) as err:
+            print(f"Advertencia: Registro omitido por datos inválidos ({item}): {err}")
 
     return productos_validos
 
