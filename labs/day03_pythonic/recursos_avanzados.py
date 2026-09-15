@@ -21,7 +21,12 @@ def reintentar(intentos_max: int = 3, retraso: float = 0.5) -> Callable:
                     )
                     if intento == intentos_max:
                         raise
-                    time.sleep(retraso)
+
+                    espera = retraso * (
+                        2 ** (intento - 1)
+                    )  # Modificación para backoff.
+                    print(f"Reintentando en {espera:.2f} segundos...")
+                    time.sleep(espera)
 
         return wrapper
 
@@ -37,19 +42,34 @@ def medir_tiempo(etiqueta: str) -> Generator[None]:
         yield
     finally:
         fin = time.perf_counter()
-        print(f"⏱️ [{etiqueta}] Tiempo transcurrido: {fin - inicio:.4f} segundos")
+        print(f" [{etiqueta}] Tiempo transcurrido: {fin - inicio:.4f} segundos")
 
 
 # 3. Generador eficiente en memoria
-def procesar_stream_datos(total_registros: int) -> Generator[dict]:
-    """Genera datos secuencialmente usando yield sin cargar todo en RAM."""
+def procesar_lotes_datos(
+    total_registros: int, tamano_lote: int = 2
+) -> Generator[list[dict]]:
+
+    lote = []
+
     for i in range(1, total_registros + 1):
-        yield {
-            "id": i,
-            "sku": f"PROD-{i:03d}",
-            "monto": float(i * 10.5),
-            "activo": i % 2 == 0,
-        }
+
+        lote.append(
+            {
+                "id": i,
+                "sku": f"PROD-{i:03d}",
+                "monto": float(i * 10.5),
+                "activo": i % 2 == 0,
+            }
+        )
+
+        if len(lote) == tamano_lote:
+            yield lote
+            lote = []
+
+    # Entregar el último lote aunque esté incompleto
+    if lote:
+        yield lote
 
 
 # Simulación de función inestable decorada
@@ -63,13 +83,17 @@ def operacion_riesgosa(datos: dict) -> dict:
 if __name__ == "__main__":
     print("--- 1. Pruebas de Generadores y Comprensiones ---")
     # Generator expression para filtrar elementos sin evaluar toda la lista
-    stream = procesar_stream_datos(5)
-    activos = (item for item in stream if item["activo"])
+    stream = procesar_lotes_datos(5, tamano_lote=2)
 
     with medir_tiempo("Procesamiento de Stream"):
-        for registro in activos:
-            try:
-                res = operacion_riesgosa(registro)
-                print(f"Éxito: {res}")
-            except ValueError as e:
-                print(f"Fallo definitivo: {e}")
+
+        for lote in stream:
+
+            for registro in lote:
+
+                if registro["activo"]:
+                    try:
+                        res = operacion_riesgosa(registro)
+                        print(f"Éxito: {res}")
+                    except ValueError as e:
+                        print(f"Fallo definitivo: {e}")
