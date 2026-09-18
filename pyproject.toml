@@ -28,3 +28,8 @@ dev = [
 
 [tool.mypy]
 explicit_package_bases = true
+
+[tool.poetry]
+name = "python-mastery-capstone"
+version = "0.1.0"
+package-mode = false
