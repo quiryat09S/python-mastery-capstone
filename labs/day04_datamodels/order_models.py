@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
@@ -89,7 +90,7 @@ def exportar_orden_dto(order: Order) -> OrderOut:
 
 
 if __name__ == "__main__":
-    payload_raw = {
+    payload_raw: dict[str, Any] = {
         "customer_email": "cliente@empresa.com",
         "items": [
             {"name": "Monitor 274k", "price": 350.50, "quantity": 1},
@@ -98,7 +99,7 @@ if __name__ == "__main__":
     }
 
     # Validar entrada
-    dto_in = OrderIn(**payload_raw)
+    dto_in = OrderIn.model_validate(payload_raw)
     print(" Entrada validada correctamente con Pydantic")
 
     # Transformar a Entidad de Dominio
