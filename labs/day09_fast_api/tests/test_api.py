@@ -1,3 +1,6 @@
+import pytest
+
+
 def test_root(client):
     response = client.get("/")
 
@@ -123,6 +126,110 @@ def get_token(client):
     assert response.status_code == 200
 
     return response.json()["access_token"]
+
+
+# Prueba antes de implementar Endpoint nuevo
+def create_order(client, headers, status="PENDING"):
+    response = client.post(
+        "/orders/",
+        headers=headers,
+        json={
+            "status": status,
+            "items": [
+                {
+                    "product_name": "Teclado",
+                    "quantity": 1,
+                    "unit_price": "35.50",
+                }
+            ],
+        },
+    )
+
+    assert response.status_code == 201
+
+    return response.json()
+
+
+# Primer test agregado
+def test_cancel_pending_order(client):
+    token = get_token(client)
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+    }
+
+    order = create_order(
+        client,
+        headers,
+    )
+
+    response = client.post(
+        f"/orders/{order['id']}/cancel",
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["id"] == order["id"]
+    assert data["status"] == "CANCELLED"
+
+
+# Se agrega prueba parametrizada
+@pytest.mark.parametrize(
+    "initial_status",
+    [
+        "CONFIRMED",
+        "SHIPPED",
+        "CANCELLED",
+    ],
+)
+def test_cancel_order_with_non_pending_status(
+    client,
+    initial_status,
+):
+    token = get_token(client)
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+    }
+
+    order = create_order(
+        client,
+        headers,
+        status=initial_status,
+    )
+
+    response = client.post(
+        f"/orders/{order['id']}/cancel",
+        headers=headers,
+    )
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == (
+        "Solo se pueden cancelar órdenes PENDING"
+    )
+
+
+# Pruebas faltantes
+def test_cancel_order_requires_authentication(client):
+    response = client.post("/orders/1/cancel")
+
+    assert response.status_code == 401
+
+
+def test_cancel_order_not_found(client):
+    token = get_token(client)
+
+    response = client.post(
+        "/orders/999999/cancel",
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
+    )
+
+    assert response.status_code == 404
 
 
 # Probar crear y listar órdenes
