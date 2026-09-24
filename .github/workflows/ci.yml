@@ -2,12 +2,16 @@ name: CI
 
 on:
   push:
-    branches: ["*"]
+    branches:
+      - "**"
+
   pull_request:
-    branches: ["*"]
+    branches:
+      - main
 
 jobs:
   quality:
+    name: Quality, tests and coverage
     runs-on: ubuntu-latest
 
     steps:
@@ -17,21 +21,37 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: "3.12"
+          cache: "poetry"
 
       - name: Instalar Poetry
         run: |
-          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade pip
           pip install poetry
 
-      - name: Instalar dependencias
-        run: poetry install --no-root
+      - name: Configurar Poetry
+        run: poetry config virtualenvs.create true
 
-      - name: Ejecutar mypy
-        run: poetry run mypy .
+      - name: Instalar dependencias
+        run: poetry install --no-interaction --no-root
 
       - name: Ejecutar Ruff
         run: poetry run ruff check .
 
       - name: Verificar formato con Black
         run: poetry run black --check .
+
+      - name: Verificar imports con Isort
+        run: poetry run isort --check-only .
+
+      - name: Ejecutar Mypy
+        run: poetry run mypy .
+
+      - name: Ejecutar pruebas y cobertura
+        run: >
+          poetry run pytest
+          labs/day09_fast_api/tests
+          --cov=labs.day09_fast_api
+          --cov-report=term-missing
+          --cov-report=xml
+          --cov-fail-under=80
