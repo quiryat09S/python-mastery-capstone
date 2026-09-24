@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from ...day10_testing_tdd.notifications import (
+    send_order_cancelled_notification,
+)
 from ..database import get_db
 from ..dependencies import get_current_user
 from ..models import Order, OrderItem, User
@@ -82,6 +85,10 @@ def cancelar_order(
     db.commit()
     db.refresh(order)
 
+    send_order_cancelled_notification(
+        username=current_user.username,
+        order_id=order.id,
+    )
     return order
 
 

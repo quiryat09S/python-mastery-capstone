@@ -38,7 +38,8 @@ dev = [
     "httpx (>=0.28.1,<0.29.0)",
     "types-python-jose (>=3.5.0.20260408,<4.0.0.0)",
     "pytest-cov (>=7.1.0,<8.0.0)",
-    "hypothesis (>=6.168.1,<7.0.0)"
+    "hypothesis (>=6.168.1,<7.0.0)",
+    "pytest-asyncio (>=1.4.0,<2.0.0)"
 ]
 
 [tool.black]
@@ -75,3 +76,7 @@ asyncio_mode = "auto"
 filterwarnings = [
     "ignore:Using `httpx` with `starlette.testclient` is deprecated.*",
 ]
+
+[tool.isort]
+profile = "black"
+line_length = 79

@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 
 
@@ -174,6 +176,62 @@ def test_cancel_pending_order(client):
 
     assert data["id"] == order["id"]
     assert data["status"] == "CANCELLED"
+
+
+# Pruebas con unittest.mock
+def test_cancel_pending_order_sends_notification(client):
+    token = get_token(client)
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+    }
+
+    order = create_order(
+        client,
+        headers,
+    )
+
+    with patch(
+        "labs.day09_fast_api.routers.orders."
+        "send_order_cancelled_notification"
+    ) as notification_mock:
+        response = client.post(
+            f"/orders/{order['id']}/cancel",
+            headers=headers,
+        )
+
+    assert response.status_code == 200
+
+    notification_mock.assert_called_once_with(
+        username="orders_user",
+        order_id=order["id"],
+    )
+
+
+def test_cancel_non_pending_order_does_not_notify(client):
+    token = get_token(client)
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+    }
+
+    order = create_order(
+        client,
+        headers,
+        status="CONFIRMED",
+    )
+
+    with patch(
+        "labs.day09_fast_api.routers.orders."
+        "send_order_cancelled_notification"
+    ) as notification_mock:
+        response = client.post(
+            f"/orders/{order['id']}/cancel",
+            headers=headers,
+        )
+
+    assert response.status_code == 409
+    notification_mock.assert_not_called()
 
 
 # Se agrega prueba parametrizada
