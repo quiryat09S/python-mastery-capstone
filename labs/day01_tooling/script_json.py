@@ -11,7 +11,7 @@ def cargar_y_procesar_datos(ruta_archivo: Path) -> list[dict]:
         raise FileNotFoundError(f"El archivo {ruta_archivo} no existe.")
 
     try:
-        with open(ruta_archivo, "r", encoding="utf-8") as archivo:
+        with open(ruta_archivo, encoding="utf-8") as archivo:
             datos = json.load(archivo)
     except json.JSONDecodeError as err:
         print(f"Error al parsear el archivo JSON: {err}")
@@ -28,7 +28,10 @@ def cargar_y_procesar_datos(ruta_archivo: Path) -> list[dict]:
                 {"id": item["id"], "nombre": item["nombre"], "precio": precio}
             )
         except (KeyError, ValueError) as err:
-            print(f"Advertencia: Registro omitido por datos inválidos ({item}): {err}")
+            print(
+                "Advertencia: Registro omitido por datos inválidos "
+                f"({item}): {err}"
+            )
 
     return productos_validos
 

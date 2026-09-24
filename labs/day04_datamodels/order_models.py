@@ -75,7 +75,9 @@ def crear_orden_desde_dto(order_id: str, dto: OrderIn) -> Order:
         for item in dto.items
     ]
     return Order(
-        id=order_id, customer_email=str(dto.customer_email), items=items_dominio
+        id=order_id,
+        customer_email=str(dto.customer_email),
+        items=items_dominio,
     )
 
 
@@ -105,7 +107,8 @@ if __name__ == "__main__":
     # Transformar a Entidad de Dominio
     orden_1 = crear_orden_desde_dto("ORD-001", dto_in)
     print(
-        f" Entidad Dominio Creada -> ID: {orden_1.id} | Total: ${orden_1.total_amount}"
+        f" Entidad Dominio Creada -> "
+        f"ID: {orden_1.id} | Total: ${orden_1.total_amount}"
     )
 
     # Probar comparación (dunder __lt__)
@@ -115,7 +118,9 @@ if __name__ == "__main__":
         items=[OrderItem(name="Mousepad", price=15.00, quantity=1)],
     )
     print(
-        f" ¿Orden 2 (${orden_2.total_amount}) < Orden 1 (${orden_1.total_amount})?: {orden_2 < orden_1}"
+        f" ¿Orden 2 (${orden_2.total_amount}) < "
+        f"Orden 1 (${orden_1.total_amount})?: "
+        f"{orden_2 < orden_1}"
     )
 
     # Exportar a DTO de salida

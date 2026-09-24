@@ -15,7 +15,8 @@ LOGGING_CONFIG: dict[str, Any] = {
     "disable_existing_loggers": False,
     "formatters": {
         "structured": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s (%(filename)s:%(lineno)d): %(message)s"
+            "format": "%(asctime)s [%(levelname)s] %(name)s "
+            "(%(filename)s:%(lineno)d): %(message)s"
         }
     },
     "handlers": {
@@ -74,7 +75,9 @@ class SalesIngestor:
     @staticmethod
     def read_csv(file_path: Path) -> list[Transaction]:
         if not file_path.exists():
-            logger.error("El archivo especificado no existe: %s", file_path.resolve())
+            logger.error(
+                "El archivo especificado no existe: %s", file_path.resolve()
+            )
             raise FileNotFoundError(f"Archivo no encontrado: {file_path}")
 
         transactions: list[Transaction] = []
@@ -111,7 +114,9 @@ class MetricsCalculator:
 
     @staticmethod
     def calculate(transactions: list[Transaction]) -> MetricsReport:
-        logger.debug("Calculando métricas para %d transacciones...", len(transactions))
+        logger.debug(
+            "Calculando métricas para %d transacciones...", len(transactions)
+        )
 
         if not transactions:
             return MetricsReport(
@@ -160,7 +165,9 @@ class JSONExporter:
 
     @staticmethod
     def export(report: MetricsReport, output_path: Path) -> None:
-        logger.info("Exportando reporte de métricas a: %s", output_path.resolve())
+        logger.info(
+            "Exportando reporte de métricas a: %s", output_path.resolve()
+        )
         report_dict = asdict(report)
 
         # Garantizar que el directorio padre exista
@@ -176,13 +183,14 @@ class JSONExporter:
 def preparar_datos_demostracion(csv_path: Path) -> None:
     """Crea un CSV de datos de prueba usando pathlib."""
     csv_path.parent.mkdir(parents=True, exist_ok=True)
+    # Contiene una fila corrupta intencional
     content = (
         "transaction_id,category,amount,timestamp\n"
         "TX1001,Electronics,299.99,2026-09-20T10:15:00+00:00\n"
         "TX1002,Books,15.50,2026-09-20T11:30:00+00:00\n"
         "TX1003,Electronics,120.00,2026-09-20T12:00:00+00:00\n"
         "TX1004,Home,45.00,2026-09-20T14:22:00+00:00\n"
-        "TX1005,Books,CORRUPT_DATA,2026-09-20T15:00:00+00:00\n"  # Fila corrupta intencional
+        "TX1005,Books,CORRUPT_DATA,2026-09-20T15:00:00+00:00\n"
     )
     csv_path.write_text(content, encoding="utf-8")
     logger.debug("Archivo de prueba generado en: %s", csv_path)
@@ -205,4 +213,7 @@ if __name__ == "__main__":
     # 4. Exportación JSON
     JSONExporter.export(reporte, output_file)
 
-    print("\nProceso finalizado. Revisa 'app_ingest.log' para ver el log estructurado.")
+    print(
+        "\nProceso finalizado. Revisa "
+        "'app_ingest.log' para ver el log estructurado."
+    )

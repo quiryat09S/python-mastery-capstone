@@ -17,7 +17,8 @@ def reintentar(intentos_max: int = 3, retraso: float = 0.5) -> Callable:
                     return func(*args, **kwargs)
                 except Exception as err:
                     print(
-                        f"[Intento {intento}/{intentos_max}] Error en {func.__name__}: {err}"
+                        f"[Intento {intento}/{intentos_max}] "
+                        f"Error en {func.__name__}: {err}"
                     )
                     if intento == intentos_max:
                         raise
@@ -36,13 +37,15 @@ def reintentar(intentos_max: int = 3, retraso: float = 0.5) -> Callable:
 # 2. Context Manager personalizado
 @contextmanager
 def medir_tiempo(etiqueta: str) -> Generator[None]:
-    """Context manager para medir el tiempo de ejecución de un bloque de código."""
+    """Mide el tiempo de ejecución de un bloque de código."""
     inicio = time.perf_counter()
     try:
         yield
     finally:
         fin = time.perf_counter()
-        print(f" [{etiqueta}] Tiempo transcurrido: {fin - inicio:.4f} segundos")
+        print(
+            f" [{etiqueta}] Tiempo transcurrido: {fin - inicio:.4f} segundos"
+        )
 
 
 # 3. Generador eficiente en memoria

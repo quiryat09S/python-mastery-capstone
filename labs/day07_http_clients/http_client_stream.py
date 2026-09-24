@@ -73,19 +73,24 @@ class ResilientHTTPClient:
                 bytes_count = 0
                 # SIM117: Combinación de contexts de `with`
                 with (
-                    httpx.Client(timeout=self.timeout, follow_redirects=True) as client,
+                    httpx.Client(
+                        timeout=self.timeout, follow_redirects=True
+                    ) as client,
                     client.stream("GET", url) as response,
                 ):
                     response.raise_for_status()
 
                     with destination.open("wb") as file_out:
-                        for chunk in response.iter_bytes(chunk_size=chunk_size):
+                        for chunk in response.iter_bytes(
+                            chunk_size=chunk_size
+                        ):
                             file_out.write(chunk)
                             bytes_count += len(chunk)
 
                 duration = time.perf_counter() - start_time
                 logger.info(
-                    "Descarga completada exitosamente. Total: %d bytes en %.2fs.",
+                    "Descarga completada exitosamente. "
+                    "Total: %d bytes en %.2fs.",
                     bytes_count,
                     duration,
                 )
@@ -117,7 +122,8 @@ class ResilientHTTPClient:
                 time.sleep(sleep_time)
 
         raise RuntimeError(
-            f"No se pudo completar la descarga desde {url} tras {self.max_retries + 1} intentos."
+            f"No se pudo completar la descarga desde "
+            f"{url} tras {self.max_retries + 1} intentos."
         )
 
 

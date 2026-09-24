@@ -10,7 +10,7 @@ Prioridad = Literal["baja", "media", "alta"]
 @runtime_checkable
 class CanalNotificacion(Protocol):
     def enviar(self, mensaje: str, destinatario: str) -> bool:
-        """Cualquier clase que implemente este método satisface el protocolo."""
+        """Define el contrato que debe cumplir el canal."""
         ...
 
 
@@ -21,7 +21,8 @@ class ServicioEmail:
 
     def enviar(self, mensaje: str, destinatario: str) -> bool:
         print(
-            f" [Email via {self.servidor_smtp}] Para: {destinatario} | Msg: {mensaje}"
+            f" [Email via {self.servidor_smtp}] "
+            f"Para: {destinatario} | Msg: {mensaje}"
         )
         return True
 
@@ -33,14 +34,14 @@ class ServicioSMS:
         return True
 
 
-# Función que depende exclusivamente del Protocolo y usa sintaxis de Unión moderna (|)
+# Depende exclusivamente del protocolo y usa unión moderna (|)
 def notificar_usuarios(
     canal: CanalNotificacion,
     destinatarios: Sequence[str],
     mensaje: str,
     prioridad: Prioridad | None = None,
 ) -> dict[str, EstadoNotificacion]:
-    """Envía notificaciones desacopladas usando Inversión de Dependencias (DIP)."""
+    """Envía notificaciones desacopladas mediante DIP."""
     resultados: dict[str, EstadoNotificacion] = {}
 
     prefix = f"[{prioridad.upper()}] " if prioridad else ""
@@ -78,5 +79,6 @@ if __name__ == "__main__":
 
     # Verificación en tiempo de ejecución con @runtime_checkable
     print(
-        f"\n¿ServicioEmail cumple CanalNotificacion?: {isinstance(email_service, CanalNotificacion)}"
+        f"\n¿ServicioEmail cumple CanalNotificacion?: "
+        f"{isinstance(email_service, CanalNotificacion)}"
     )
