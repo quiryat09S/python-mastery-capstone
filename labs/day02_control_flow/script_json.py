@@ -11,7 +11,7 @@ class ErrorDatoInvalido(Exception):
 
 
 def procesar_registro(item: dict) -> dict:
-    """Aplica Pattern Matching y Expresiones Regulares para validar cada registro."""
+    """Valida cada registro con Pattern Matching y Expresiones Regulares."""
     match item:
         case {
             "sku": str(sku),
@@ -20,14 +20,18 @@ def procesar_registro(item: dict) -> dict:
             "activo": True,
         }:
             if not re.match(PATRON_SKU, sku):
-                raise ErrorDatoInvalido(f"SKU '{sku}' no cumple el formato 'AAA-000'")
+                raise ErrorDatoInvalido(
+                    f"SKU '{sku}' no cumple el formato 'AAA-000'"
+                )
 
             try:
                 precio = float(precio_raw)
                 if precio <= 0:
                     raise ValueError("El precio debe ser positivo")
-            except (ValueError, TypeError) as e:
-                raise ErrorDatoInvalido(f"Precio inválido ({precio_raw}): {e}")
+            except (ValueError, TypeError) as exc:
+                raise ErrorDatoInvalido(
+                    f"Precio inválido ({precio_raw}): {exc}"
+                ) from exc
 
             return {"sku": sku, "nombre": nombre, "precio": precio}
 
@@ -35,14 +39,16 @@ def procesar_registro(item: dict) -> dict:
             raise ErrorDatoInvalido("Registro inactivo")
 
         case _:
-            raise ErrorDatoInvalido("Estructura de registro no compatible o incompleta")
+            raise ErrorDatoInvalido(
+                "Estructura de registro no compatible o incompleta"
+            )
 
 
 def cargar_y_procesar_datos(ruta_archivo: Path) -> list[dict]:
     if not ruta_archivo.exists():
         raise FileNotFoundError(f"El archivo {ruta_archivo} no existe.")
 
-    with open(ruta_archivo, "r", encoding="utf-8") as archivo:
+    with open(ruta_archivo, encoding="utf-8") as archivo:
         datos = json.load(archivo)
 
     productos_validos = []

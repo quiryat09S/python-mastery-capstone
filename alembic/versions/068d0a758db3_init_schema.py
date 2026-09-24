@@ -50,7 +50,9 @@ def upgrade() -> None:
         sa.Column("order_id", sa.Integer(), nullable=False),
         sa.Column("product_name", sa.String(length=100), nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=False),
-        sa.Column("unit_price", sa.Numeric(precision=10, scale=2), nullable=False),
+        sa.Column(
+            "unit_price", sa.Numeric(precision=10, scale=2), nullable=False
+        ),
         sa.ForeignKeyConstraint(
             ["order_id"],
             ["orders.id"],
