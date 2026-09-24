@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from ...day10_testing_tdd.notifications import (
+    send_order_cancelled_notification,
+)
 from ..database import get_db
 from ..dependencies import get_current_user
 from ..models import Order, OrderItem, User
@@ -41,6 +44,51 @@ def crear_order(
     db.commit()
     db.refresh(order)
 
+    return order
+
+
+# Endpoint agregado
+@router.post(
+    "/{order_id}/cancel",
+    response_model=OrderResponse,
+)
+def cancelar_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    statement = (
+        select(Order)
+        .options(selectinload(Order.items))
+        .where(
+            Order.id == order_id,
+            Order.user_id == current_user.id,
+        )
+    )
+
+    order = db.scalars(statement).first()
+
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order no encontrada",
+        )
+
+    if order.status != "PENDING":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Solo se pueden cancelar órdenes PENDING",
+        )
+
+    order.status = "CANCELLED"
+
+    db.commit()
+    db.refresh(order)
+
+    send_order_cancelled_notification(
+        username=current_user.username,
+        order_id=order.id,
+    )
     return order
 
 
