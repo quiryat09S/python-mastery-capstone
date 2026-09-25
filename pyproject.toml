@@ -18,7 +18,12 @@ dependencies = [
     "pyjwt (>=2.15.0,<3.0.0)",
     "python-multipart (>=0.0.32,<0.0.33)",
     "python-jose (>=3.5.0,<4.0.0)",
-    "pwdlib[argon2] (>=0.3.1,<0.4.0)"
+    "pwdlib[argon2] (>=0.3.1,<0.4.0)",
+    "pandas (>=3.0.6,<4.0.0)",
+    "numpy (>=2.5.3,<3.0.0)",
+    "scikit-learn (>=1.9.1,<2.0.0)",
+    "joblib (>=1.6.0,<2.0.0)",
+    "polars (>=1.44.2,<2.0.0)"
 ]
 
 
@@ -39,7 +44,8 @@ dev = [
     "types-python-jose (>=3.5.0.20260408,<4.0.0.0)",
     "pytest-cov (>=7.1.0,<8.0.0)",
     "hypothesis (>=6.168.1,<7.0.0)",
-    "pytest-asyncio (>=1.4.0,<2.0.0)"
+    "pytest-asyncio (>=1.4.0,<2.0.0)",
+    "pandas-stubs (>=3.0.5.260914,<4.0.0.0)"
 ]
 
 [tool.black]
@@ -95,3 +101,11 @@ exclude_also = [
     "if TYPE_CHECKING:",
     "pragma: no cover",
 ]
+
+[[tool.mypy.overrides]]
+module = [
+    "joblib",
+    "sklearn",
+    "sklearn.*",
+]
+ignore_missing_imports = true
