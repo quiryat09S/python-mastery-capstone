@@ -80,3 +80,18 @@ filterwarnings = [
 [tool.isort]
 profile = "black"
 line_length = 79
+
+[tool.coverage.run]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+    "*/benchmarks.py",
+    "*/profile_fetcher.py",
+    "htmlcov/*",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
