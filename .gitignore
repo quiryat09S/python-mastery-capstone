@@ -221,3 +221,6 @@ __marimo__/
 *.db
 *.sqlite
 *.sqlite3
+
+# Artefacto
+*.joblib
