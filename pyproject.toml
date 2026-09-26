@@ -94,6 +94,7 @@ omit = [
     "*/benchmarks.py",
     "*/profile_fetcher.py",
     "htmlcov/*",
+    "*/run_inference.py",
 ]
 
 [tool.coverage.report]
