@@ -23,7 +23,8 @@ dependencies = [
     "numpy (>=2.5.3,<3.0.0)",
     "scikit-learn (>=1.9.1,<2.0.0)",
     "joblib (>=1.6.0,<2.0.0)",
-    "polars (>=1.44.2,<2.0.0)"
+    "polars (>=1.44.2,<2.0.0)",
+    "typer (>=0.27.2,<0.28.0)"
 ]
 
 
@@ -45,7 +46,8 @@ dev = [
     "pytest-cov (>=7.1.0,<8.0.0)",
     "hypothesis (>=6.168.1,<7.0.0)",
     "pytest-asyncio (>=1.4.0,<2.0.0)",
-    "pandas-stubs (>=3.0.5.260914,<4.0.0.0)"
+    "pandas-stubs (>=3.0.5.260914,<4.0.0.0)",
+    "typer[all] (>=0.27.2,<0.28.0)"
 ]
 
 [tool.black]
@@ -111,3 +113,6 @@ module = [
     "sklearn.*",
 ]
 ignore_missing_imports = true
+
+[project.scripts]
+orders = "labs.day18_cli.cli:app"
