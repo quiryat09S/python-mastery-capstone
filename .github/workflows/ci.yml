@@ -34,6 +34,9 @@ jobs:
       - name: Instalar dependencias
         run: poetry install --no-interaction --no-root
 
+      - name: Auditar dependencias
+        run: poetry run pip-audit --local
+
       - name: Ejecutar Ruff
         run: poetry run ruff check .
 

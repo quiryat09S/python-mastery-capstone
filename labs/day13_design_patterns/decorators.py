@@ -5,9 +5,9 @@ from .domain import Product
 from .strategies import PricingStrategy
 
 
-def cached_price[
-    T
-](function: Callable[[Product], T],) -> Callable[[Product], T]:
+def cached_price[T](
+    function: Callable[[Product], T],
+) -> Callable[[Product], T]:
     cache: dict[Product, T] = {}
 
     @wraps(function)
