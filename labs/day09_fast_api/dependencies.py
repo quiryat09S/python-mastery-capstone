@@ -1,6 +1,7 @@
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -37,7 +38,7 @@ def get_current_user(
         if not isinstance(username, str):
             raise credentials_exception
 
-    except JWTError as exc:
+    except InvalidTokenError as exc:
         raise credentials_exception from exc
 
     user = db.scalar(select(User).where(User.username == username))

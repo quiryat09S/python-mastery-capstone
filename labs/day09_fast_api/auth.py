@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, timedelta
 
-from jose import JWTError, jwt
+import jwt
+from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 
 SECRET_KEY = "clave-temporal-solo-para-desarrollo"
@@ -51,5 +52,5 @@ def decode_access_token(token: str) -> dict:
             SECRET_KEY,
             algorithms=[ALGORITHM],
         )
-    except JWTError as exc:
+    except InvalidTokenError as exc:
         raise ValueError("Token inválido") from exc
