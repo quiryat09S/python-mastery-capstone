@@ -24,7 +24,10 @@ dependencies = [
     "joblib (>=1.6.0,<2.0.0)",
     "polars (>=1.44.2,<2.0.0)",
     "typer (>=0.27.2,<0.28.0)",
-    "pydantic-settings (>=2.15.0,<3.0.0)"
+    "pydantic-settings (>=2.15.0,<3.0.0)",
+    "grpcio (>=1.84.0,<2.0.0)",
+    "protobuf (>=7.36.2,<8.0.0)",
+    "redis (>=8.1.0,<9.0.0)"
 ]
 
 
@@ -47,12 +50,20 @@ dev = [
     "pytest-asyncio (>=1.4.0,<2.0.0)",
     "pandas-stubs (>=3.0.5.260914,<4.0.0.0)",
     "typer[all] (>=0.27.2,<0.28.0)",
-    "pip-audit (>=2.10.1,<3.0.0)"
+    "pip-audit (>=2.10.1,<3.0.0)",
+    "grpcio-tools (>=1.84.0,<2.0.0)",
+    "types-protobuf (>=7.35.1.20260906,<8.0.0.0)",
+    "types-grpcio (>=1.84.0.20260928,<2.0.0.0)"
 ]
 
 [tool.black]
 target-version = ["py312"]
 line-length = 79
+extend-exclude = '''
+/(
+    labs/day18_interoperability/generated
+)/
+'''
 
 [tool.mypy]
 explicit_package_bases = true
@@ -66,6 +77,9 @@ packages = [
 [tool.ruff]
 target-version = "py312"
 line-length = 79
+extend-exclude = [
+    "labs/day18_interoperability/generated",
+]
 
 [tool.ruff.lint]
 select = [
@@ -89,6 +103,9 @@ filterwarnings = [
 [tool.isort]
 profile = "black"
 line_length = 79
+skip_glob = [
+    "labs/day18_interoperability/generated/*.py",
+]
 
 [tool.coverage.run]
 omit = [
@@ -98,6 +115,9 @@ omit = [
     "*/profile_fetcher.py",
     "htmlcov/*",
     "*/run_inference.py",
+    "*/labs/day18_interoperability/generated/*",
+    "*/labs/day18_interoperability/grpc_client.py",
+    "*/labs/day18_interoperability/grpc_server.py",
 ]
 
 [tool.coverage.report]
@@ -111,8 +131,11 @@ module = [
     "joblib",
     "sklearn",
     "sklearn.*",
+    "labs.day18_interoperability.generated.*",
 ]
+ignore_errors = true
 ignore_missing_imports = true
+
 
 [project.scripts]
 orders = "labs.day18_cli.cli:app"
