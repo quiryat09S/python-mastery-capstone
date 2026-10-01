@@ -62,11 +62,15 @@ line-length = 79
 extend-exclude = '''
 /(
     labs/day18_interoperability/generated
+  | labs/final_orders/infrastructure/migrations/versions
 )/
 '''
 
 [tool.mypy]
 explicit_package_bases = true
+exclude = [
+    "^alembic/env\\.py$",
+]
 
 [tool.poetry]
 package-mode = true
@@ -79,6 +83,7 @@ target-version = "py312"
 line-length = 79
 extend-exclude = [
     "labs/day18_interoperability/generated",
+    "labs/final_orders/infrastructure/migrations/versions",
 ]
 
 [tool.ruff.lint]
@@ -105,6 +110,7 @@ profile = "black"
 line_length = 79
 skip_glob = [
     "labs/day18_interoperability/generated/*.py",
+    "labs/final_orders/infrastructure/migrations/versions/*.py",
 ]
 
 [tool.coverage.run]

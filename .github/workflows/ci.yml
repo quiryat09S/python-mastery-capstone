@@ -14,6 +14,11 @@ jobs:
     name: quality
     runs-on: ubuntu-latest
 
+    env:
+      ORDERS_JWT_SECRET: ${{ secrets.ORDERS_JWT_SECRET }}
+      ORDERS_ENVIRONMENT: testing
+      DATABASE_URL: sqlite:///ci_orders.db
+
     steps:
       - name: Descargar código
         uses: actions/checkout@v4
@@ -26,7 +31,7 @@ jobs:
       - name: Instalar Poetry
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install poetry==2.4.3
 
       - name: Verificar Poetry
         run: poetry --version
@@ -52,8 +57,8 @@ jobs:
       - name: Ejecutar pruebas y cobertura
         run: >
           poetry run pytest
-          labs/day09_fast_api/tests
-          --cov=labs.day09_fast_api
+          labs/final_orders/tests
+          --cov=labs.final_orders
           --cov-report=term-missing
           --cov-report=xml
           --cov-fail-under=80
@@ -97,7 +102,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository_owner }}/final-orders-api
 
       - name: Construir y publicar imagen
         uses: docker/build-push-action@v6
