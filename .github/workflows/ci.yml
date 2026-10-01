@@ -14,6 +14,11 @@ jobs:
     name: quality
     runs-on: ubuntu-latest
 
+    env:
+      ORDERS_JWT_SECRET: ${{ secrets.ORDERS_JWT_SECRET }}
+      ORDERS_ENVIRONMENT: testing
+      DATABASE_URL: sqlite:///ci_orders.db
+
     steps:
       - name: Descargar código
         uses: actions/checkout@v4
