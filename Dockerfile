@@ -47,4 +47,4 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["uvicorn", "labs.day09_fast_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "labs.final_orders.main:app", "--host", "0.0.0.0", "--port", "8000"]
